@@ -1,6 +1,48 @@
 # java
-
+- when jvm encounters a object which is not loaded, it invokes the class loader
+    - class loader reads the byte code and loads it to the heap as a class class object
+    - class loading happens once per class per program execution
+    - class class objects are never garbage collected and JVM maintains reference to them
+    - static variables and all byte code for methods reside in class class object
+    - class loading happens for the class first time it is used
+    - it is destroyed when the program ends and heap memory is returned to the os
 - 
+## .equals and equality
+- o1 == o2 => this is going to compare the object reference and check if the variables are pointing to the same object => this is comparison by identity check
+- Comparison by equality check
+  - comparison done by state
+  - class designer must override the equals method ensure the comparison takes place properly
+    - by default the equals method of the Object class does identity check (are the reference variables pointing to the same object or not)
+- EVERY CLASS MUST OVERRIDE EQUALS IF IT HAS INSTANCE VARIABLES else silent failure will occur
+- collections to work correctly depends on the user to override the equals method for search method
+
+## .hashCode()
+- equal object (same state) must return same hash code
+- use object state to generate hashCode
+- String class designer has overidden .hashCode function beautifully and any object state can be converted to string on overiding .toString method and .hashCode can be called on this string
+
+
+## API
+- a service that is offered
+  - Class user is offered a set of methods
+  - Class user is offered a interface of the class to code against
+  - object class returns random hash code and NEEDS to be overrided (otherwise every collection or class calling hash code will fail)
+  - all hash implementations use has code to assign buckets
+
+
+## Best Practices
+- Hide the state and expose setters and getters and parameterized constructor 
+  - validating inputs and ensuring object consistency 
+  - IllegalArgumentException thrown for bad input
+- behaviors are implemented as instance methods
+  - business validation fails
+    - checked exception raised
+    - custom exception is a class that extends exception with a descriptive name
+    - marks throws clause
+- Always code to interface referance
+- IT IS NON NEGOTIABLE: Always override .equals, .hashCode() and toString  (return .hashCode called on toString)
+- Always use generics or type safe collections
+- implement comparable interface
 
 ## Strings
 - StringBuilder is thread safe and mutable
@@ -8,7 +50,7 @@
   - .append("abc")
   - .reverse()
   - .toString()
-- ALWAYS USE .equals(str) to compare strings
+- ALWAYS USE .equals(str) to compare any object including strings to compare state
 
 
 ## functions
@@ -26,72 +68,40 @@
 
 
 ### static
-- when jvm encounters a object which is not loaded, it invokes the class loader
-    - class loader reader the byte code and loads it to the heap as a class class object
-    - class loading happens once per class per program execution
-    - class class objects are never garbage collected and JVM maintains reference to them
-    - static members reside in class class object
-    - class loading happens for the class first time it is used
-    - it is destroyed when the program ends and heap memory is returned to the os
+- static variables and all byte code for methods reside in class class object
 - can be used with: -
     - method 
         - class scoped method
         - non behavioral method 
         - Best Practice: always call static methods using class name and never use reference variable
+          - the reference name is internally replaced with class name by jvm during compilation
+          - readability reduces and it is not best practice to use variable name for static calls
+          - ALWAYS USE BEST PRACTICE
         - used for utility functionality (methods that are only dependent on input and not state of object)
         - static methods cant access non static members without creating object
     - variable 
         - belongs to the class and only one copy per class
         - stored in class class object
         - initialized like instance variables (local variables are not initialized )
-    - initializer- there are 3 types of initializer
-        - field initializer- instance variables initialized inside class
-            - int x = 20; //executed when the object is created
+    - initializer- there are 3 types of initializer shown in execution order (lower members in the execution order can access higher members as they will be available at the time of execution)
+        - static field initializer- executed first when the class is loaded for static variables
             - static int a = 10; //executed when the class class object is loaded
             - static double d = Math.random(); 
+        - static initializer- executed when the class is loaded
+            - static {a=5;}
+            - executed once per class
+        - field initializer- instance variables initialized inside class
+            - int x = 20; //executed when the object is created 
         - instance initializer-
             - {} code block coded inside a class outside other members
             - can access instance members and static members
-        - static initializer
     - inner class
-- 
 
 
 ### final modifier
 - a final class can not be extended
 - a final method can not be overridden
 - a final variable's value can not be changed
-
-
-
-
-## order of execution for object creation
-- static field initializers- executed first when the class is loaded for static variables
-    - static int a = 10; //executed when the class class object is loaded
-    - static double d = Math.random(); 
-- static initializers- executed when the class is loaded
-    - static {a=5;}
-    - executed once per class
-- field initializers- executed when the object is created
-    - int x = 20; 
-- instance initializers (can be more than one - executed in order): when we want some lines of code to be executed no matter which constructor is executed we use instance initializer
-    - {} code block coded inside a class outside other members
-    - can access instance members and static members
-- constructor body: can accepts parameters from users and initialize instance variables
-
-eg
-public class T {
-    static int i = 0; //static field initializer - executed once when class is loaded (1)
-    static{i=10;}//static initializer - executed once when class is loaded (2) [this is executed after static field initializer and static fields can be accessed to access instance fields, object should be created]
-
-    int j = 0; //instance field initializer - executed once per object creation
-    {j=20;} // instance initializer
-
-    public T{ // constructor - last step of object creation
-        j = 50;
-        i = 50;
-    }
-}
 
 
 # Inheritance and overriding
@@ -111,11 +121,12 @@ public class T {
 
 
 
-- composition is a feature where i have an object obj2 reference inside my class. Now i can call obj2's methods inside my class and reuse code
+- composition: used to reuse code
+    - is a feature where i have an object obj2 reference inside my class. Now i can call obj2's methods inside my class and reuse code
 
 
-- run time poliformism 
-    - to write poliformic code, we must code to parent interface and let jvm pick implementation in run time
+- run time polymorphism
+    - to write polymorphism code, we must code to parent interface and let jvm pick implementation in run time
     - enhanced implementation is picked in runtime
 
     - when you write the code if you dont know where the object referance is pointing to, then the code is polymorphic
@@ -131,7 +142,7 @@ public class T {
             - clearly we don't want to initialize it and user of the class should be allowed to initialize the variable (through setter or parameterized constructor)
         - local reference variable
     - polymorphic code is generic and flexible as its implementation is not fixed and changes during runtime
-    - IMPORTANT: only public or accessible members of a class are inherited
+    - IMPORTANT: only public or accessible members of a class are inherited although all the parent classes are created in an onion manner. just cant be accessed
     - constructor is not inherited
 
 
@@ -170,7 +181,7 @@ public class T {
 - compilation fails if parent obj has only parameterized constructor and child class does not explicitly call super(parameter);
  
 
-- private methods can not be overridden as it can not be inherited
+- private methods can not be overridden as it can not be inherited but new method with same name can be created
 
 - compiler adds (if not there) "super();" as the first statement of every constructor
     - super(); calls the parents constructor
@@ -208,11 +219,30 @@ public class T {
 - to hold constants
 - to represent markers
 - to create most generic flexible polymorphic code
-    - objects from different class highricies can be passed
+    - objects from different class heighrachies can be passed
 - interface members are by default marked public unlike classes where the default is packaged
+
+### java 8 Default Keyword
+- Default: Keyword modifier added in java 8
+  - until java 8 any method added to an interfaces must be marked abstract
+  - Definition: A non-abstract method within an interface that includes a body, marked with the default keyword.
+  - Purpose: Enables interface evolution by providing a standard implementation that classes can inherit or override.
+    - If i have a interface and I want to enhance it and add a new abstract method, then all the 1000 classes that extends it will break
+    - this allows us to provide a dummy implementation in the interface that the class designer are expected to override
+    - static methods can also be added to interfaces now using default (static methods can not be marked abstract)
+  - Conflict Resolution: If a class implements multiple interfaces with the same default method signature, it must override the method to resolve the ambiguity.
+  - default methods cant be marked final in interfaces as it is expected that the class user overrides the method
+- Covariance: return datatype can be changed to subtype while overriding //introduced in jdk 5
+  - 
+
 
 
 # Access Specifiers and packages
+- overridden methods can widen access specifier (not reduce access specifier)
+  - private
+  - package
+  - protected
+  - public
 - Class and Interface and be marked only public and package
 - package is default inside classes
 - package in java is used to create a grouping of related classes
@@ -239,8 +269,8 @@ public class T {
 - do not have polymorphic catch for non user facing methods.
     - the catch block is to handle error. Only have catch errors that you can handle.
     - code failing is bad
-    - code failing is better than code not failing and not performing its job
-    - You should not have empty catch
+    - code failing is better than code not failing and not performing its job - SILENT FAILURE
+    - You should not have empty catch - SILENT FAILURE
 - In catch block
     - log stack trace to file
     - print generic message to customer
@@ -251,7 +281,7 @@ public class T {
         - finally return is supersedes the return in normal code block
         - finally return is supersedes the return in catch block
         - finally return is supersedes the thrown exception
-    - FINALLY IS USED ONLY 3RD PARTY RESOURCES IS USED IN TRY AND IT NEEDS TO BE RELEASED
+    - FINALLY IS USED ONLY WHEN 3RD PARTY RESOURCES ARE USED IN TRY AND IT NEEDS TO BE RELEASED
     - If there is exception in finally the finally exception is the only exception that is thrown
     - There can only be one reason for returning
     - only if System.exit(0); is executed then finally is not executed
@@ -259,51 +289,27 @@ public class T {
 - Forcing caller to catch exception
     - adding the throws clause in the method header
     - this is done for checked exceptions where we dont want to blame the invoker and the user has given bad inputs
-    - compiler compels the invoker of the method hast to 
+    - compiler compels the invoker of the method to:
      - HANDLE: catch this exception 
-     - DUCK: throws the same exception
-- checked Exceptions
-  - non runtime exceptions (all Throwables happens at runtime)
-  - runtime exceptions happen due to bad code
+     - DUCK: throws the same exception 
+- runtime exceptions happen due to bad code
+- checked Exceptions - non runtime exceptions
+  - all Throwables happens at runtime
   - checked exceptions are checked by the compiler
-    - if throws has been marked for the used checked exception
-    - if invoker handles it
+    - if throws has been marked in the function header for the used checked exception
+    - if invoker of this function handles it
   - no checking by compiler for unchecked exceptions and developer is expected to change code
   - checked exceptions represent business or environment failure that the user should correct
-  - 
-
 
 
 # ecplise
 - ctrl + " " => code complete
 - ctrl + 1 
+- ctrl + shift + o => import dependencies
 - source
 - workspace is a folder where all the projects are stored
 - First thing to do when eclipse is launched is create a new project => File->New->Project
-- 
-
-
-
-
-
-
-
-
-
-
-# java 8
-- Default: Keyword modifier added in java 8
-  - until java 8 any method added to an interfaces must be marked abstract
-  - Definition: A non-abstract method within an interface that includes a body, marked with the default keyword.
-  - Purpose: Enables interface evolution by providing a standard implementation that classes can inherit or override.
-    - If i have a interface and I want to enhance it and add a new abstract method, then all the 1000 classes that extends it will break
-    - this allows us to provide a dummy implementation in the interface that the class designer are expected to override
-    - static methods can also be added to interfaces now using default (static methods can not be marked abstract)
-  - Conflict Resolution: If a class implements multiple interfaces with the same default method signature, it must override the method to resolve the ambiguity.
-  - default methods cant be marked final in interfaces as it is expected that the class user overrides the method
-- Covariance: return datatype can be changed to subtype while overriding //introduced in jdk 5
-  - 
-
+- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000 -jar ./target/collections-1.0.0.jar asdf asdf wer uwrtywywre
 
 
 
@@ -355,73 +361,152 @@ public class T {
 - maven-surefire-plugin is used to test only a subset of test cases per environment
   - <plugin>
     - <artifactId>maven-surefire-plugin</artifactId>
-      - <configuration>
-        - <groups>dev</groups> // the test cases that need to be executed
-        - <excludedGroups>QA</excludedGroups> // the test cases that should be excluded
-      - </configuration>
-    - </plugin>
+    - <configuration>
+      - <groups>dev</groups> // the test cases that need to be executed
+      - <excludedGroups>QA</excludedGroups> // the test cases that should be excluded
+    - </configuration>
+  - </plugin>
 - Bae64.getDecoder().decode("encrypted pwd")
   - when saving passwords, to ensure that anyone does not just see it and understand the password, it is encoded in base 64
 - if multiple reference variables are pointing to the same object then => assertSame
 - if multiple reference variables are pointing to multiple objects with the same content then => assertEquals
-- 
-
-
-# collections
-- a container of elements
-- interface Collections (behaviors)
-    - boolean add(Object e)
-    - boolean contains(Object e)
-    - boolean remove(Object e) => removes only the first occurrence of the element like this element
-    - int size()
-    - Iterator iterator() => retrieve one one element at a time
-    - clear() => collection becomes empty(all the elements are made to default values)
-    - boolean isEmpty()
-    - TWO COLLECTIONS OPERATIONS
-    - addAll(Collection c) => add all elements from the passed collection to the collection
-    - removeAll(Collection c) => all elements from the passed collection will be searched and removed
-    - retainAll(Collection c) => only elements from the passed collection will be retained in the collection
-    - boolean containsAll(Collection c) => checks if all elements from the passed collection is present in my collection or not
-    - Object[] toArray() => converts the collection to array
-- interface List extends Collections
-  - position backed ordered collection offering indexed access
-    - ordered implies that on inserting, the retrieval happens in a particular order
-  - allows duplicates
-  - Implementations
-    - ArrayList
-    - LinkedList
-    - CopyOnWriteList  
-  - ArrayList has super fast random access
-  - LinkedList has super fast insert and delete but slower random access
-- interface Set extends Collections
-  - no duplicates
-  - unordered and no position
-  - Implementations
-    - HashSet -  hashed bucket of nodes
-    - LinkedHashSet - linked hashed bucket of nodes
-    - TreeSet - balanced binary tree of nodes
-
-- interface Queue extends Collections
-  - Ordered retrieval
-  - Implementations
-    - LinkedList => IMPLEMENTS BOTH List and Queue interfaces
-    - PriorityQueue
-    - Dequeue
-    - BlockingQueue
-
-
-- interface Map (in parallel with Collections and does not extend it. It deals with elements and not element)
-  - container of entries (key value pair)
-  - Implementation
-    - HashMap
-    - LinkedHashMap
-    - TreeMap
-    - 
 
 
 
+# collections library and data structures
+- collections is a container of elements
+- collections holds Object references
+
+## Array data structure:
+- Demerits
+  - preallocation of memory needed
+  - methods not provided
+  - slow insertion and deletion and other manipulation operations
+  - slow search O(n)
+- Features
+  - continuous memory allowing constant time super fast random indexed access
+  - only one datatype to ensure same sized boxes
+  - fixed size
+
+## interface Collection (behaviors)
+- OPERATIONS ON SELF
+  - boolean add(Object e)
+  - boolean contains(Object e)
+  - boolean remove(Object e) => removes only the first occurrence of the element like this element
+  - int size()
+  - Iterator iterator() => retrieve one one element at a time
+  - void clear() => collection becomes empty(all the elements are made to default values)
+  - boolean isEmpty()
+- TWO COLLECTIONS OPERATIONS
+  - boolean addAll(Collection c) => add all elements from the passed collection to the collection
+  - boolean removeAll(Collection c) => all elements from the passed collection will be searched and removed
+  - boolean retainAll(Collection c) => only elements from the passed collection will be retained in the collection
+  - boolean containsAll(Collection c) => checks if all elements from the passed collection is present in my collection or not
+  - Object[] toArray() => converts the collection to array
+- Collections.sort(myCollection) //sorts based on natural order (class designer must have implemented comparable interface and provided compareTo method implementation)
+- MyComparator compr = new MyComparator()
+- Colletions.sort(myCollection, compr) // compares based on provided Comparator. MyComparator class must implement Comparator interface
+## interface List extends Collections
+- position backed ordered collection offering indexed access
+  - ordered implies that on inserting, the retrieval happens in a particular order
+- allows duplicates
+- Additional Methods in List interface are position backed methods
+  - boolean add(int pos, Object ele) // overloading
+  - Object remove(int pos) //overloading
+  - int indexOf(Object ele)
+  - Object get(int pos)
+- Implementations
+  - ArrayList
+      - ArrayList has super fast random access
+      - insert and delete operations are slow
+      - pre allocation of memory needed STATIC DATA STRUCTURE
+      - slow search
+      - add -> o(1)
+      - get -> o(1)
+      - insert -> o(n - m)
+      - contains -> o(n)
+      - remove by search -> n-m + m = n
+      - remove by position -> n-m
+  - LinkedList
+      - Doubly linked list of nodes
+      - pre allocation of memory not needed and a big advantage when dealing with large data sets DYNAMIC DATA STRUCTURE
+      - LinkedList has super fast insert and delete but slower random access
+      - add -> o(1)
+      - get -> del(n/2)
+      - insert -> del(n - m)
+      - contains -> o(n)
+      - remove by search -> n-m => o(n/2)
+      - remove by position -> del(n-m)
+  - CopyOnWriteList 
+## interface stack
+- push(Object ele)
+- Object pop()
+- boolean isEmpty()
+## interface Set extends Collections
+- no duplicates
+- unordered and no position
+- Implementations
+  - HashSet - hashed bucket of nodes
+    - unordered retrieval
+    - fastest set
+  - LinkedHashSet - linked hashed bucket of nodes
+    - insertion ordered retrieval
+  - TreeSet - balanced binary tree of nodes
+    - sorted order retrieval
+    - slowest set
+
+## interface Queue extends Collections
+- Ordered retrieval
+- Implementations
+  - LinkedList => IMPLEMENTS BOTH List and Queue interfaces
+  - PriorityQueue
+  - Dequeue
+  - BlockingQueue
 
 
+## interface Map 
+- in parallel with Collections and does not extend it. It deals with elements and not element
+- container of entries (key value pair)
+- Implementation
+  - HashMap
+  - LinkedHashMap
+  - TreeMap
+  - 
+
+# generics
+- We want to make teh generic type specefic
+- If the collection is generic and not type safe,
+  - ArrayList col = new ArrayList();
+  - for(Object o: col){
+    - if(o instanceof Integer){
+      - Integer i = (Integer) o;
+    - }
+  - }
+- ArrayList<Integer> col = new ArrayList<Integer>();
+  - now all elements in the col are of type Integer
+  - I can add child class of the type as usual
+  - the generic on both sides should be same and cant be a child object
+
+## public interface Comparable 
+- for using tree based implementation or compare any two objects the class must implement Comparable
+  - public int compareTo(Object o)
+    - if o instanceof MyClass
+      - MyClass cls = (MyClass) o
+    - else
+      - throw new IllegalArgumentException("only MyClass objects can be compared)
+- p1.compareTo(p2)
+  - +ve => p1>p2
+  - -ve => p1<p2
+  - 0 => p1 == p2
+- This is implemented by class designer
+
+## public interface Comparator
+- it is a interface implemented by the user of the class
+- create a seperate class and implement this interface
+- implement the public int compare(Object o1, Object o2) (same as the compareTo method)
+- pass a object of this class to the tree set
+- Slc slc = new Slc(); // This is my class implementing the Comparator interface.
+- Set ts = new TreeSet(slc) // this will use our custom ordering and not natural ordering or the Comparable compareTo implementation
 
 
 
@@ -431,15 +516,12 @@ public class T {
 - Interface called Constants is usually created to hold all constants used in the application
 - TO WRITE GENERIC FLEXIBLE POLYMORPHIC ALWAYS CODE TO INTERFACE REFERENCE
 - classes with only private constructors can not be inherited
+- Every class provides a service to its class user 
 - 
 
 
 
-
-
-
-11
-
+comparitor 2 done
 
 
 
