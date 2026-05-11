@@ -50,7 +50,7 @@
   - .append("abc")
   - .reverse()
   - .toString()
-- ALWAYS USE .equals(str) to compare any object including strings to compare state
+- ALWAYS USE .equals(obj) to compare any object including strings to compare state
 
 
 ## functions
@@ -90,7 +90,7 @@
         - static initializer- executed when the class is loaded
             - static {a=5;}
             - executed once per class
-        - field initializer- instance variables initialized inside class
+        - instance field initializer- instance variables initialized inside class
             - int x = 20; //executed when the object is created 
         - instance initializer-
             - {} code block coded inside a class outside other members
@@ -521,27 +521,219 @@
 
 
 
-comparitor 2 done
+# Collections static methods
+
+
+java.util
+    - Arrays
+        - sort()
+        - binarySearch()
+        - copy(a1,a2)
+    - Collections:
+        - In Java, Collections (with an "s") is a powerful utility class in the java.util package that provides static methods for operating on and returning collections
+        - Static methods:
+            - void sort(List l)
+            - void shuffle(List l)
+            - int binarySearch(List l)  // on sorted list
+            - int frequency(List l, Object ele)
+
+# Comparable vs Comparator
+- Comparable
+    - int compareTo(Object o)
+    - java.lang package
+    - designer implements Comparable interface to provide natural ordering
+    - implemented only once per class
+    - used by
+        - TreeSet
+        - Collections.sort
+        - Arrays.sort
+- Comparator
+    - int compare(Object o1, Object o2)
+    - java util package
+    - user implements implements Comparator to provide comparison based on non-natural ordering (custom order)
+    - can have any no of classes implementing3rd party Comparator
+    - class implementing Comparator interface should be explicitly passed as a parameter
+        - TreeSet(comp1)
+        - Collections.sort(list, comp2)
+        - Arrays.sort(arr, comp3)
+
+
+# pubic interface Iterator 
+- Collection col = new ArrayList();
+- Iterator it = col.iterator;
+- a way to traverse the elements of a collection
+- Methods
+    - boolean hasNext()
+    - Object next()
+    - Object remove()
+- for each loop internally uses iterator
+- If I modify the collection while iterating, ConcurrentModificationException Hence:
+    - Collections boolean remove(Object e) can not be used 
+    - while iterating directly or using for each loop
+    - use Iterator object it .remove() method to remove the object returned by the it.next() method
 
 
 
-class T
-{
-    int x = 10;
-    int b = 20;
-    sop(x);
-}
-p. 
+Collections revision
+- only comparable elements can be passed to 
+    - class designer has implemented Comparable interface
+    - class implementing Comparator is passed
+- TreeSet
+- Array sort method
+- collection.sort
 
 
 
-# we
-150c
+# public Interface Maps
+- keys are unique
+    - ALWAYS HAVE ONLY IMMUTABLE AS KEYS
+- Behaviors
+    - Object put(Object key, Object value) // if key exists, it replaces it and returns the old value
+    - size()
+    - boolean containsKey(Object key)
+    - boolean containsValue(Object value)
+    - remove(Object key)
+    - Object get(Object key)
+    - clear() // empties the map completely
+    - isEmpty()
+    - entrySet() // set fo entries;
+        - Set<Entry<String, String>> entries = m.entrySet()
+        - // Set typed to Entry of String key and String value
+        - for (Entry<String, String> en : entries)
+            - en.getKey()
+            - en.getValue()
+    - putAll(Map m)
+    - Set keySet()
+    - Collection values()
+- HashMap - unordered
+- LinkedHashMap - insertion order
+- TreeMap
+- ConcurrentHashMap
+
+# Collections usage
+- print unique words in a sentence in:
+    - no particular order => HashSet
+    - in insertion order => LinkedHashSet
+    - sorted order => TreeSet
 
 
-# h
 
 
-# TODO:
-- retrive the questions list and solve it
-- 
+# Threads
+- parallel processing -> multiple processors involved
+- multitasking -> single processor handling multiple tasks
+    - benefit: higher thruput (lower time taken)
+    - perquisites
+        - multiple tasks should be there
+        - tasks should be independent of each other
+        - context switching takes time hence sequential tasking is 99% of the time faster and preferred unless
+            - one of the tasks should involve 3rd party resource that is taking time
+                - eg. hard disk read,or network api call
+            - GUI or user facing applications should always be responsive and one task should always face the user
+            - when the system has multiple processors
+    - multitasking is a concept that is implemented as a feature called multiprocessing by OS
+    - multithreading is a feature of the JVM that gives us the ability to multitask
+
+- Thread
+    - java.lang.Thread class obj
+    - thread of execution
+        - it is 1 job being executed by creating 1 control flow managed by one stack frame
+        - Job is a method
+            - for every job jvm creates a stack frame to manage control flow and hold local variables
+        - multithreading is having multiple threads of execution
+        - Asking JVM it execute a method is a job
+            - until now we have only asked the JVM to execute the main method
+            - some of the internal tasks like garbage collection is done as a separate thread of execution
+- How to create a thread of execution
+    - create multiple jobs by embedding statements in run method
+        - extend class Thread and override run()
+        - implement interface Runnable and override run()
+    
+    - Ask JVM to execute each job as a separate thread of execution
+        - invoke start() method on a Thread object
+            - start method is called on the main thread
+            - the start method contains native calls that creates a new thread
+            - the new thread is started with the run() method as the start point
+            - the original stack with start method is popped of with the new thread running in parallel
+
+    - Note: 
+        - there are only two placeholders for TOEx in java 
+            - one is main method 
+            - another is run() method
+        - one class can have only one run method soo each job must be coded in a separate class
+        - invoke start() method on a <Thread object> is the only way to start a TOEx
+        - calling run() does not create a new TOEx and executes in current thread
+        - start method is inherited from the Thread class and has OS native calls
+
+        - Contract by jvm: Every thread of execution will go to completion
+            - no contract regarding the order of execution
+            - don't use multithreading if deterministic ordered execution is needed
+            - the goal of multithreading is fastest execution possible and not order
+        - You can only start the car once
+            - start() can be called on one Thread object only once
+            - to start 2 threads create 2 thread objects and call start() on them
+        - Until all threads of execution complete normally or ubnormally the JVM does not shutdown
+        - the parent thread starting the child thread will have 0 control once the thread starts. The parent has control only to start the thread
+        - except accessing command line arguments everything else that can be done in main method can be done in run() method
+        - exception in run() method will not be caught in main() and must be handled separately. If unhandled exception is found in a thread, that thread is killed.
+        - Best Practice
+            - Always use Runnable as we can logically extend a class that we want to enhance
+            - extends is used only to enhance a class and we are not enhancing the Thread class
+            - using Runnable helps create a logical separation between the job and thread and any no of threads can be made to execute the same job. (NOTE: start can  not be called on the same thread object twice)
+        - the Thread class implements Runnable interface
+        - the run method obviously does not accept any arguments but the class can have state that can be set by having only a parameterized constructor
+
+- JVM Thread Scheduler is does management of the lifecycle of threads with the following states:
+    - new
+    - runnable
+    - running
+    - waiting/sleeping/blocked
+    - dead
+
+## classThread
+- interupt()
+- join()
+- run()
+- start()
+- set/getPriority() 1=>lowest Priority, 10=>highest priority
+    - gc has priority =1
+    - when heap memory comes to 70-80% the priority is bumped to 10
+    - we do not know howmany objects are garbage collected as we dont know how long it will be run and if it will run first
+    - the contract of priority is that the higher priority threads are more likely to get picked for execution
+
+
+
+- FAQ
+    - two command prompts made to execute 2 programs => multiprocessing done by OS
+    - One Java program executed and within that program there are 2-3 jobs involving 3rd party resource then those jobs are executed within 1 JVM as multiple threads of execution
+
+
+
+
+
+
+
+
+
+
+
+# important notes
+- when an int is added to a collection, auto boxing happens and the int value is stored in a Integer object
+- Whenever there is search favour Hashing
+
+
+
+
+
+
+
+
+# java io
+- Scanner sc1 = new Scanner(System.in);
+- sop("enter name");
+- String name = sc1.next();
+
+
+
+
+
