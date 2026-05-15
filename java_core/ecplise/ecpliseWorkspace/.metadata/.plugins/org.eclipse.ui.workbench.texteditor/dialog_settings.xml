@@ -8,6 +8,17 @@
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="instance"/>
+			<item value="e"/>
+			<item value="current.getValue()"/>
+			<item value="inde"/>
+			<item value="remove"/>
+			<item value="ent.getNext() != nu"/>
+			<item value="return current"/>
+			<item value="current.equals(ele)"/>
+			<item value="contains"/>
+			<item value="junit"/>
+			<item value="shwin/Desktop/myJarFiles/myJ"/>
 			<item value="///////////"/>
 			<item value="testin"/>
 			<item value="test"/>

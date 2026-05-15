@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><testrun name="TestMvn" project="test" tests="1" started="1" failures="0" errors="0" ignored="0">
-  <testsuite name="com.uis.mvn.TestMvn" time="0.0">
-    <testcase name="testTesting" classname="com.uis.mvn.TestMvn" time="0.0"/>
-  </testsuite>
-</testrun>

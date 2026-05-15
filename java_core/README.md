@@ -31,6 +31,60 @@
 
 
 ## Best Practices
+
+1) Best Practices a class designer should follow
+   1) Create 1 class definition per .java file and mark it public(mostly)
+   2) OOAD steps
+      1) identify objects
+      2) per object identify "has a" (instance variable) and "is a" (extends class) relationships and behaviors (methods)
+      3) for methods identify multiplicity (1-1, 1-n). for 1-n create a Collection typed to the inst var and return it
+   3) understand how state impacts behavior and vice versa
+      1) because state affects behavior, hide direct access of state from user
+      2) mark state as private
+      3) create setters, getters and parameterized constructor. Only set state on validation of inputs and raise exceptions(IllegalArgumentException) if bad inputs are passes
+      4) per method if method behavior depends on invokers input 
+         1) apply input validations and throw IllegalArgumentException if bad inputs are passes
+         2) apply business validations and per business validation
+            1) create a exception class with proper exception name
+            2) add throws declaration to the method header
+            3) user forced to handle the exception or throw it
+         3) Only if all validations succeed then perform business logic
+   4) Test the class using a tester class (box unit testing)
+   5) per class generate javadoc (javadoc *.java)
+   6) Always for param reference variable, instance reference variable and local reference -> code to parent reference!!!
+   7) Override equals(), hashCode(), toString() methods inherited from Object class
+   8) Only use try-catch and catch the exceptions you know how to handle
+      1) use specific catch block for the exceptions that you know how to handle
+      2) use generic catch block for user facing methods to catch all failures
+      3) have a finally block to release third party resources only
+      4) prevent silent failure by returning in finally block, having empty catch, very generic catch in methods and suppressing failure not related to the method etc
+   9)  To implement natural ordering, implement the COmparable interface
+2) Best practices the class user should follow
+   1) embed all user facing methods in generic try-catch and print/log the stack trace for debugging
+   2) read the javadoc of the class being used
+      1) understand the input and outputs to the methods and the exceptions raised 
+      2) if business exceptions are raised, then handle them in try catch and give appropriate message to user
+      3) if we do not know how to handle the business exception, then throw it
+   3) for testing if two objects are equal in state, use o1.equals(o2) for state comparison
+   4) for testing if a obj is smaller/bigger 
+      1) check if the designer has implemented Comparable
+      2) if yes, use o1.compareTo(o2) => +ve => o1>o2
+   5) for many elements use Collection based on requirement
+   6) code to parent reference always for all reference variables
+   7) If an element is being added to a HashSet or any has based implementation
+      1) check if designer has overridden both .equals() and .hashCode()
+      2) Never add StringBuilder to collections as the above methods are not overridden by designer
+   8) Create as many objects with as many reference variables as needed but deference teh reference variables once the object is no longer needed to make it eligible for garbage collection
+   9) CODE AT LEAST 10 PER TOPIC
+3)  ensure all access to mutable state is synchronized
+    1)  we must ensure that our class is thread safe (when ever a object of our class is accessed multiple threads of execution, there are chances of data corruption and hence synchronization is necessary)
+    2)  ensure that the ordering of obtaining of locks is in same order to prevent deadlock
+
+
+
+
+
+
 - Hide the state and expose setters and getters and parameterized constructor 
   - validating inputs and ensuring object consistency 
   - IllegalArgumentException thrown for bad input
@@ -43,6 +97,7 @@
 - IT IS NON NEGOTIABLE: Always override .equals, .hashCode() and toString  (return .hashCode called on toString)
 - Always use generics or type safe collections
 - implement comparable interface
+- implement thread safety for access to all instance and static mutable variables
 
 ## Strings
 - StringBuilder is thread safe and mutable
@@ -50,6 +105,11 @@
   - .append("abc")
   - .reverse()
   - .toString()
+  - StringBuilder class designer has not overridden .equals method and hence equality check will not work
+  - convert sb toString() and then use .equals equality check
+  - hence never put sb to collections beacuse
+    - sb .equals is not overriden by designer
+    - sb is mutable and in maps keys MUST not be mutable
 - ALWAYS USE .equals(obj) to compare any object including strings to compare state
 
 
@@ -65,6 +125,10 @@
 # Optional modifiers
 
 - constructor can not be marked with optional modifiers
+- abstract -> method, class
+- static -> method, variable, inner class, initializer
+- final -> class, method, variable
+- synchronized -> method, code block
 
 
 ### static
@@ -634,8 +698,9 @@ Collections revision
     - multitasking is a concept that is implemented as a feature called multiprocessing by OS
     - multithreading is a feature of the JVM that gives us the ability to multitask
 
-- Thread
+- Thread can refer to one of the two
     - java.lang.Thread class obj
+      - invoke start() method on this object to create a thread of execution
     - thread of execution
         - it is 1 job being executed by creating 1 control flow managed by one stack frame
         - Job is a method
@@ -645,15 +710,20 @@ Collections revision
             - until now we have only asked the JVM to execute the main method
             - some of the internal tasks like garbage collection is done as a separate thread of execution
 - How to create a thread of execution
-    - create multiple jobs by embedding statements in run method
+    - create multiple jobs either by
         - extend class Thread and override run()
-        - implement interface Runnable and override run()
+        - implement interface Runnable and override run() (BEST PRACTICE)
     
     - Ask JVM to execute each job as a separate thread of execution
+        - Create a new thread object
+          - if the class is extending thread then simply create the class object and call start method on it
+          - if the class is implementing runnable then create a new Thread object by passing the runnable class object as a parameter to the thread constructor
+            - Runnable runn1 = new MyRunnableClass()
+            - Thread t1 = new thread(runn1);
+            - t1.start();
         - invoke start() method on a Thread object
-            - start method is called on the main thread
             - the start method contains native calls that creates a new thread
-            - the new thread is started with the run() method as the start point
+            - the new thread is started with the run() method as the start point (first fn in its stack frame)
             - the original stack with start method is popped of with the new thread running in parallel
 
     - Note: 
@@ -662,64 +732,178 @@ Collections revision
             - another is run() method
         - one class can have only one run method soo each job must be coded in a separate class
         - invoke start() method on a <Thread object> is the only way to start a TOEx
-        - calling run() does not create a new TOEx and executes in current thread
+        - calling run() does not create a new TOEx and executes the run method in current thread
         - start method is inherited from the Thread class and has OS native calls
 
         - Contract by jvm: Every thread of execution will go to completion
             - no contract regarding the order of execution
             - don't use multithreading if deterministic ordered execution is needed
             - the goal of multithreading is fastest execution possible and not order
+            - NOTE: if any running Thread calls System.exit() then all running, waiting/sleeping/blocked and runnable threads are closed and the program shuts down
         - You can only start the car once
             - start() can be called on one Thread object only once
-            - to start 2 threads create 2 thread objects and call start() on them
-        - Until all threads of execution complete normally or ubnormally the JVM does not shutdown
+            - to start 2 threads create 2 thread objects and call start() on them (thread object can be created either by passing a runnable object to thread constructor or by creating an object of a class extending thread class)
+        - Until all threads of execution complete (move to dead state) normally or ubnormally the JVM does not shutdown (unhandled exception kills the thread)
         - the parent thread starting the child thread will have 0 control once the thread starts. The parent has control only to start the thread
-        - except accessing command line arguments everything else that can be done in main method can be done in run() method
-        - exception in run() method will not be caught in main() and must be handled separately. If unhandled exception is found in a thread, that thread is killed.
+        - except accessing command line arguments everything else that can be done in main method can be done in run() method (even though there are multiple threads, typically the main method is the user facing method where we primarily do input and output)
+        - exception in run() method will not be caught in main() and must be handled separately. If unhandled exception is found in a thread, that thread is killed and it is moved to dead state form running state.
         - Best Practice
             - Always use Runnable as we can logically extend a class that we want to enhance
             - extends is used only to enhance a class and we are not enhancing the Thread class
             - using Runnable helps create a logical separation between the job and thread and any no of threads can be made to execute the same job. (NOTE: start can  not be called on the same thread object twice)
+              - I can pass the same runnable object to multiple Thread constructors and create multiple thread objects with the same runnable object or job.
+              - hence when start() is called on all these Thread objects, they will have the same Runnable reference and will execute the same job
         - the Thread class implements Runnable interface
-        - the run method obviously does not accept any arguments but the class can have state that can be set by having only a parameterized constructor
+        - the run method obviously does not accept any arguments but the class can have state that can be set by having parameterized constructor
+          - force the user to pass state by only exposing a parameterized constructor
 
-- JVM Thread Scheduler is does management of the lifecycle of threads with the following states:
-    - new
-    - runnable
-    - running
-    - waiting/sleeping/blocked
-    - dead
+- Runnable interface
+  - create a object of the class implementing this interface
+  - multiple Thread objects can be created using the object created from this class
+  - hence the same job can be done by multiple threads created by calling start() method on the Thread objects created
+  - This is not possible in thread class extension 
+
 
 ## classThread
+### instance methods: -
 - interupt()
-- join()
-- run()
-- start()
-- set/getPriority() 1=>lowest Priority, 10=>highest priority
+- run() => does not create a new thread but simply executes the function in the same thread
+- start() => puts the run function as the start stack frame in a new thread and allows it to execute in parallel
+- set/getPriority() 1=>lowest Priority, 10=>highest priority (default = 5)
     - gc has priority =1
     - when heap memory comes to 70-80% the priority is bumped to 10
-    - we do not know howmany objects are garbage collected as we dont know how long it will be run and if it will run first
+    - we do not know how many objects are garbage collected as we dont know how long it will be run and if it will run first
     - the contract of priority is that the higher priority threads are more likely to get picked for execution
-
+- join() => pause the execution of the current thread until the thread on which it is called completes
+  - the main thread calling this is blocked until thread1 completes its execution
+  - this forces sequential execution
+  - the thread enters the blocked state
+  - Typically the thread starting a new thread uses the new thread reference to call this method to ensure the new thread completes execution before continuing execution
+### Static methods: -
+  - Thread.currentThread() => returns current running thread Thread object
+    - Thread.currentThread().getnAME() => gets current running thread's name
+  - Thread.sleep(<no of milliseconds>) => puts the thread to the sleeping state for the time passed
+    - the thread enters the sleep state
+  - Thread.yield() => give way to other threads
+    - I am ok to be bumped back to runnable state
+    - No guarantee that this will happen
+    - the same thread can be picked up once yielding :)
 
 
 - FAQ
     - two command prompts made to execute 2 programs => multiprocessing done by OS
     - One Java program executed and within that program there are 2-3 jobs involving 3rd party resource then those jobs are executed within 1 JVM as multiple threads of execution
+    - if a thread is made to sleep by calling static method Thread.sleep(1000) for one second then when will it become running again?
+      - Ans) we have no idea. It will become runnable after 1 second :)
+      - typically used for animations and retrying for third party resources
+      - Time schedulers are used for deterministic timed execution and not Thread.sleep(10)
+    - What is race condition -> when multiple threads shared data in undeterministic manner leading to data corruption
+
+
+
+## lifecycle
+- JVM Thread Scheduler is does management of the lifecycle of threads with the following states:
+    - new
+      - when an object of thread class is created the thread is in new state
+      - new can be moved to runnable only (runnable can not be moved to new)
+    - runnable
+      - when the start method is invoked, the thread enters this state
+      - runnable is waiting state. if there are many threads, and not enough processors, then every thread is given some process time and runnable state is when this is waiting
+      - runnable can be moved to running and running can be bumped back to runnable 
+        - this is done by the jvm and we have no control over it
+        - we can only request order by setting priority where there is higher priority for jvm to pick a higher priority thread
+    - running
+      - we have no full proof way of pushing a thread to this state but only runnable thread can enter this state
+      - the thread in execution
+      - can be bumped back to runnable to give another thread a chance
+      - can be moved to waiting sleeping or blocked (not bidirectional - waiting/sleeping/blocked threads can only be moved to runnable and not running)
+    - waiting/sleeping/blocked
+      - sleeping state
+        - when Thread.sleep(1000) static method is called inside current running thread, it enters this state for 1 second or 1000 ms
+      - blocked state
+        - when I perform a blocking operation like IO, eg sc1.readLine() the thread automatically enters this state until the hard disk returns data after which it will be bumped back to runnable
+        - when database or 3rd party resource is queried the thread enters this state (happens automatically)
+        - when explicitly thread1.join() is called  inside current running thread then the calling thread enters the blocked state until thread1 goes to dead state (completes normally or ubnormally)
+        - when i call a method on a locked Object (NOTE THAT A METHOD IS NOT LOCKED AND ONLY A OBJECT CAN BE LOCKED WITH ONE AND ONLY ONE LOCK THAT IS ACQUIRED BY A THREAD)the thread enters the blocked state until the lock is released
+    - dead
+      - thread can completed execution correctly or unhandled exception has resulted in the killing of the thread
 
 
 
 
+## influcing thread scheduling
+- setPriority 
+- yield
+- sleep
+
+## Sharing data among Threads and Thread Safety
+- we might have created a class today and tomorrow this class can be shared across multiple threads of execution. 
+- race condition can occur when one thread partially modifies the object state and is bumped back to runnable and the second threads reads bad data or corrupts the objects state by differently modifying the data and the first thread continuous execution on a changed object state
+- Classes that are thread save
+  - Stateless class
+  - Immutable class/read only class (final class with final variables and parameterized constructor)
+  - synchronization implemented to mutable classes of all access to shared data (static or instance variables)
+
+- synchronized
+  - can be applied to method or code block
+  - only one thread can enter any synchronized method of a object at any given point of time 
+    - NOTE ONLY METHODS ARE SYNCHRONIZED BUT THE LOCK IS ON THE OBJECT AND NOT ON THE METHOD
+    - when a method is marked synchronized, its containing Object has a lock.
+    - whenever a thread calls this method, it acquires the lock ON THE OBJECT
+    - once the method finishes execution, the lock is returned to the object
+    - if another thread calls any synchronized method on a locked Object, it tries to acquire the lock on the object. it enters the blocked state until the lock is released back to the Object.
+  - NOTE: there is only one lock per object and not method.
+    - Soo if a lock is acquired it is done for the entire object
+  - IMPORTANT: all access to shared data must be marked synchronized (both read and write)
+
+- synchronized code block
+  - why should the entire method of multiple lines be blocked for only a few lines of data access
+  - syncronised(this){}
+  - we can pass any object referance and a lock will be accquired on that object
+  - this allows me to have multiple locks for each variable
 
 
+  - deadlock is a scenario that occurs when multiple threads of execution are waiting for locks held by each other
+  - this occurs only when atleast two nested synchronized code blocks are involved with different object locks
+  - Prevention
+    - enforce order of lock acquisition across jobs (generally followed)
+    - lock timeout: release the acquired lock after a timeout if second lock is not got
+    - lock mapping
 
+## Object class methods that affect thread scheduling
+- myColl.wait()
+- myColl.notify()
+- myColl.notifyAll()
 
+- (Note: Thread.sleep(10) puts the thread to sleep state and the lock on the object is not released (if in a synchronized code block))
+- .wait() Object class method puts the thread to waiting state and releases the lock on the object if inside a synchronized code block
 
+- dhobi example
+  - there is a dhobi and a helper
+  - both the classes will accept in and out butti through constrtuctor
+    - Collection inButti
+    - Collection outButti
+  - run method of dhobi
+    - synchronized(inButti){inButti.wait();}
+      - calling .wait() on inButti will put the thread to waiting state RELEASING THE LOCK ON inButti (no resources wasted)
+      - the moment wait is called the lock is released
+      - the thread will come back to runnable only when 
+        - inButti.notifyAll() is called
+  - run method of helper
+    - collect cloths
+    - add them to inButti
+    - synchronized(inButti){inButti.notifyAll();}
 
+## java.util.concurrency
+- since the above implementation is hard we have collections that are implementing this and we just need to use them
+- BlockingQueue => it is a concurrent queue where any no of threads can write to it and any number of threads can read from it and there is no problem
 
 # important notes
 - when an int is added to a collection, auto boxing happens and the int value is stored in a Integer object
 - Whenever there is search favour Hashing
+- singleton design pattern => private constructor, synchronized method to return single object instance
+- sequential execution is necessary whenever there is some check done and then some action and hence a lock on the object must be acquired
+- obj.wait() does not wait for change in object state but waits for obj.notifyAll to be called
 
 
 
@@ -737,3 +921,12 @@ Collections revision
 
 
 
+
+
+# InnerClass
+- anonymous inner class
+new Thread(){
+    public void run(){
+        for(int i=0; i<100; i++>){.....}
+    }
+}.start(); 

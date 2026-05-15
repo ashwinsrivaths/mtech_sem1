@@ -2,6 +2,7 @@
 <section name="Workbench">
 	<section name="MavenProjectWizardLocationPage">
 		<list key="location">
+			<item value="/home/ashwin/Desktop/tech/tech/java_core/ecplise/ecpliseWorkspace/test"/>
 			<item value="/home/ashwin/Desktop/ecpliseWorkspace/test"/>
 		</list>
 		<list key="projectNameTemplate">
@@ -44,6 +45,7 @@
 	</section>
 	<section name="MavenProjectWizardArtifactPage">
 		<list key="groupId">
+			<item value="com.uis.collection"/>
 			<item value="com.uis"/>
 			<item value="ashwin"/>
 		</list>
@@ -51,6 +53,7 @@
 			<item value="ashwin srivaths"/>
 		</list>
 		<list key="artifactId">
+			<item value="collections"/>
 			<item value="mvn-parent"/>
 			<item value="test"/>
 		</list>

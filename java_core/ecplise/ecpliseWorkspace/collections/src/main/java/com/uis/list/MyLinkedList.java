@@ -343,8 +343,6 @@ public class MyLinkedList implements MyList {
 		System.out.println(n.getValue());
 	}
 
-	
-
 }
 
 class Node {
