@@ -1,8 +1,8 @@
 # java
 - when jvm encounters a object which is not loaded, it invokes the class loader
-    - class loader reads the byte code and loads it to the heap as a class class object
+    - class loader reads the byte code and loads it to the heap as a Class class object (Class is the name of the class of which the object is being created)
     - class loading happens once per class per program execution
-    - class class objects are never garbage collected and JVM maintains reference to them
+    - class class objects are never garbage collected and JVM maintains reference to them till program execution is completed (properly or eceptionally (all threads) orr one of the thread calls System.exit())
     - static variables and all byte code for methods reside in class class object
     - class loading happens for the class first time it is used
     - it is destroyed when the program ends and heap memory is returned to the os
@@ -19,21 +19,21 @@
 ## .hashCode()
 - equal object (same state) must return same hash code
 - use object state to generate hashCode
-- String class designer has overidden .hashCode function beautifully and any object state can be converted to string on overiding .toString method and .hashCode can be called on this string
+- String class designer has overridden .hashCode function beautifully and any object state can be converted to string on overriding .toString method and .hashCode can be called on this string
 
 
 ## API
 - a service that is offered
   - Class user is offered a set of methods
   - Class user is offered a interface of the class to code against
-  - object class returns random hash code and NEEDS to be overrided (otherwise every collection or class calling hash code will fail)
-  - all hash implementations use has code to assign buckets
+  - object class returns random hash code and NEEDS to be overridden (otherwise every collection or class calling hash code will fail)
+  - all hash implementations use hash code to assign buckets
 
 
 ## Best Practices
 
 1) Best Practices a class designer should follow
-   1) Create 1 class definition per .java file and mark it public(mostly)
+   1) Create 1 class definition per .java file with the same name as the file
    2) OOAD steps
       1) identify objects
       2) per object identify "has a" (instance variable) and "is a" (extends class) relationships and behaviors (methods)
@@ -46,7 +46,7 @@
          1) apply input validations and throw IllegalArgumentException if bad inputs are passes
          2) apply business validations and per business validation
             1) create a exception class with proper exception name
-            2) add throws declaration to the method header
+            2) add throws declaration to the method header (enforced by compiler)
             3) user forced to handle the exception or throw it
          3) Only if all validations succeed then perform business logic
    4) Test the class using a tester class (box unit testing)
@@ -55,10 +55,10 @@
    7) Override equals(), hashCode(), toString() methods inherited from Object class
    8) Only use try-catch and catch the exceptions you know how to handle
       1) use specific catch block for the exceptions that you know how to handle
-      2) use generic catch block for user facing methods to catch all failures
+      2) use generic catch block for user facing methods to catch all failures(and log them for debugging)
       3) have a finally block to release third party resources only
-      4) prevent silent failure by returning in finally block, having empty catch, very generic catch in methods and suppressing failure not related to the method etc
-   9)  To implement natural ordering, implement the COmparable interface
+      4) PREVENT silent failure by NOT returning in finally block, having empty catch, very generic catch in methods and suppressing failure not related to the method etc
+   9)  To implement natural ordering, implement the Comparable interface
 2) Best practices the class user should follow
    1) embed all user facing methods in generic try-catch and print/log the stack trace for debugging
    2) read the javadoc of the class being used
@@ -69,16 +69,17 @@
    4) for testing if a obj is smaller/bigger 
       1) check if the designer has implemented Comparable
       2) if yes, use o1.compareTo(o2) => +ve => o1>o2
+      3) else pass a Comparator implemented class object myComparatorObject.compare(o1,o2); => +ve => o1>o2
    5) for many elements use Collection based on requirement
    6) code to parent reference always for all reference variables
-   7) If an element is being added to a HashSet or any has based implementation
+   7) If an element is being added to a HashSet or any hash based implementation
       1) check if designer has overridden both .equals() and .hashCode()
       2) Never add StringBuilder to collections as the above methods are not overridden by designer
-   8) Create as many objects with as many reference variables as needed but deference teh reference variables once the object is no longer needed to make it eligible for garbage collection
+   8) Create as many objects with as many reference variables as needed but deference the reference variables once the object is no longer needed to make it eligible for garbage collection
    9) CODE AT LEAST 10 PER TOPIC
 3)  ensure all access to mutable state is synchronized
-    1)  we must ensure that our class is thread safe (when ever a object of our class is accessed multiple threads of execution, there are chances of data corruption and hence synchronization is necessary)
-    2)  ensure that the ordering of obtaining of locks is in same order to prevent deadlock
+    1)  we must ensure that our class is thread safe (when ever a object of our class is accessed by multiple threads of execution, there are chances of data corruption and hence synchronization is necessary)
+    2)  ensure that the ordering of obtaining of locks is in same order to prevent deadlock when having nested synchronization blocks
 
 
 
@@ -92,9 +93,9 @@
   - business validation fails
     - checked exception raised
     - custom exception is a class that extends exception with a descriptive name
-    - marks throws clause
-- Always code to interface referance
-- IT IS NON NEGOTIABLE: Always override .equals, .hashCode() and toString  (return .hashCode called on toString)
+    - mark throws clause
+- Always code to interface reference to have generic polymorphic code
+- IT IS NON NEGOTIABLE: Always override .equals, .hashCode() and toString  (return .hashCode can be called on toString)
 - Always use generics or type safe collections
 - implement comparable interface
 - implement thread safety for access to all instance and static mutable variables
@@ -748,7 +749,7 @@ Collections revision
         - except accessing command line arguments everything else that can be done in main method can be done in run() method (even though there are multiple threads, typically the main method is the user facing method where we primarily do input and output)
         - exception in run() method will not be caught in main() and must be handled separately. If unhandled exception is found in a thread, that thread is killed and it is moved to dead state form running state.
         - Best Practice
-            - Always use Runnable as we can logically extend a class that we want to enhance
+            - Always use Runnable as we logically extend a class that we want to enhance
             - extends is used only to enhance a class and we are not enhancing the Thread class
             - using Runnable helps create a logical separation between the job and thread and any no of threads can be made to execute the same job. (NOTE: start can  not be called on the same thread object twice)
               - I can pass the same runnable object to multiple Thread constructors and create multiple thread objects with the same runnable object or job.
@@ -766,7 +767,7 @@ Collections revision
 
 ## classThread
 ### instance methods: -
-- interupt()
+- interupt() => waiting/sleeping/blocked threads can be intrupted. this will raise an InterruptedException and will enter the catch block of the run method
 - run() => does not create a new thread but simply executes the function in the same thread
 - start() => puts the run function as the start stack frame in a new thread and allows it to execute in parallel
 - set/getPriority() 1=>lowest Priority, 10=>highest priority (default = 5)
@@ -781,7 +782,7 @@ Collections revision
   - Typically the thread starting a new thread uses the new thread reference to call this method to ensure the new thread completes execution before continuing execution
 ### Static methods: -
   - Thread.currentThread() => returns current running thread Thread object
-    - Thread.currentThread().getnAME() => gets current running thread's name
+    - Thread.currentThread().getName() => gets current running thread's name
   - Thread.sleep(<no of milliseconds>) => puts the thread to the sleeping state for the time passed
     - the thread enters the sleep state
   - Thread.yield() => give way to other threads
@@ -802,7 +803,7 @@ Collections revision
 
 
 ## lifecycle
-- JVM Thread Scheduler is does management of the lifecycle of threads with the following states:
+- JVM Thread Scheduler does management of the lifecycle of threads with the following states:
     - new
       - when an object of thread class is created the thread is in new state
       - new can be moved to runnable only (runnable can not be moved to new)
@@ -810,8 +811,8 @@ Collections revision
       - when the start method is invoked, the thread enters this state
       - runnable is waiting state. if there are many threads, and not enough processors, then every thread is given some process time and runnable state is when this is waiting
       - runnable can be moved to running and running can be bumped back to runnable 
-        - this is done by the jvm and we have no control over it
-        - we can only request order by setting priority where there is higher priority for jvm to pick a higher priority thread
+        - this is done by the jvm and WE HAVE NO CONTROL OVER IT.
+        - we can only request order by setting priority where there is higher priority for jvm to pick a higher priority thread or by calling yield
     - running
       - we have no full proof way of pushing a thread to this state but only runnable thread can enter this state
       - the thread in execution
@@ -842,7 +843,7 @@ Collections revision
 - Classes that are thread save
   - Stateless class
   - Immutable class/read only class (final class with final variables and parameterized constructor)
-  - synchronization implemented to mutable classes of all access to shared data (static or instance variables)
+  - synchronization implemented to mutable classes for access to all shared data (static or instance variables)
 
 - synchronized
   - can be applied to method or code block
@@ -897,6 +898,115 @@ Collections revision
 ## java.util.concurrency
 - since the above implementation is hard we have collections that are implementing this and we just need to use them
 - BlockingQueue => it is a concurrent queue where any no of threads can write to it and any number of threads can read from it and there is no problem
+
+
+
+
+# java IO
+
+- java.io.File
+  - a class that represents the file path and not the actual file (however we can create an delete a file/directory we can not write or modify a file)
+  - boolean exists()
+  - boolean isFile()
+  - boolean isDirectory()
+  - File[] listFiles() => null for file
+  - String getAbsolutePath()
+  - int f.length()
+  - boolean f.canRead()
+  -  f.delete() //delete file
+  - String f.getName()
+  - File[] listFiles()
+
+## Stream => ordered sequence of data
+- methods
+    - abstract int read()
+            - although a byte is needed to signify end of file, an int is returned
+            - if -1 is returned then end of file is reached
+            - the lower 8 bits signify the data and the int should be down-casted to a Byte to read the data
+    - abstract write(int i)
+            - where an int is expected i can pass a byte and there is implicit up casting
+    - close() // in finally block
+    - all the above methods throws IoException which is a checked exception and user must handle it (duck or catch)
+
+- There are 4 main types of stream
+  - Byte based stream      
+        - abstract class InputStream concrete implementations => FileInputStream, ByteArrayInputStream, SequenceInputStream
+        - abstract class OutputStream concrete implementations => FileOutputStream, ByteArrayOutputStream, SequenceOutputStream
+  - Character based stream
+        - abstract class Reader concrete implementations => FileReader, CharacterArrayReader, PipedReader, SequenceReader
+        - abstract class Writer concrete implementations  => FileWriter, CharacterArrayWriter, PipedWriter, SequenceWriter
+  - primitive based stream
+        - DataInputStream
+        - DataOutputStream
+  - Object Based stream (Serialization and Deserialization used mainly for RMI-remote program invocation)
+        - ObjectOutputStream (concrete class)
+              - ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(new File("./myFilePath/myFile.dat")));
+              - objOut.writeObject(new String("test object to be serialized. the class designer must have implemented the Serializable marker interface"));
+              - objOut.close(); // in finally block
+          - only one object can be serialized to one file
+        - ObjectInputStream (concrete class)
+              - ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(new File("./myFilePath/myFile.dat")));
+              - Object obj = objIn.readObject(); // throws classNotFoundException as well
+              - objIn.close(); // in finally block
+          - The entire Object graph (object and all objects that its instance variables are pointing to) is serialized during serialization
+          - to allow serialization, our class must implement Serializable marker interface (it is a interface with 0 methods) (if this marker is not present, on the object or any object its instance variable is pointing to then NotSerializableException is raised)
+          - Bypassing serialization
+            - Statics are not a part of the state and a brand new static variable is created when deserialized
+            - transient is a optional modifier that can only be attached to instance variables in a class that is marked Serializable and such variables will be null when deserialized (not included in serialization)
+            - If a child class marks the class as Serializable and the parent class has not marked itself Serializable then only the child's objects state is serialized and the parents instance variables will be null and not serialized
+
+- BufferedReader: better performance due to buffering
+  - Basically a wrapper on file reader
+  - br = new BufferedReader(new FileReader(new File("./path/file.txt")));
+    - String line = br.readLine(); // is a additional method only for (file character based) buffer reader (note that bytes don't have a concept of new line)
+  - BufferedInputStream can be used with FileInputStream for byte based data
+    - bin = new BufferedInputStream(new FileInputStream(f));
+    - bout = new BufferedOutputStream(new FileOutputStream("./a.txt")); 
+    - no concept of line here
+    - this class also offers same read() and write() methods and internally implements buffering 
+
+
+- lr = new LineNumberReader(new BufferedReader(new FileReader(f)));
+  - LineNumberReader is a wrapper around BufferedReader which is a wrapper of FileReader which we have understood
+  - each wrapper adds functionality as required and provides additional functionality
+  - this class gives line number.
+
+
+
+
+## Cloning
+- Memo
+      - Memo: when overriding methods minimum I need to retain parents access specifier but I can increase
+      - clone method of Object class must be overridden to support cloning and it is a protected marked method.
+      - when i override this method I can mark it public
+- to clone any object: -
+  - the class must implement Cloneable interface (or CLoneNotSupportedException will be thrown) (marker interface)
+  - override the clone() method from Object class (by default Object class clone method is marked protected and does a shallow copy)
+    - shallow copy is where premitives are copied fine but referances are exactly copied and the new object referances points to the old objects referance
+- Ways to support cloning
+  - Forbid cloning:  (best practice)
+      - dont implement Cloneable marker interface and just throw CloneNotSupportedException in the clone method
+  - support cloning 
+      - make clone method public and use try catch and not throw any exception
+      - ensure all instance variables are also pointing to cloned objects
+  - conditionally support cloning
+      - throw exception making the user handle it(rest is support cloning)
+      - this is done if we have an instance variable that we dont know if it supports cloning or not
+  - support cloning only for subclasses
+      - clone method implementation provided but class not marked Cloneable to facilitate subclassers to make their object cloneable
+
+- since cloning is complex we generally forbid it and use alternatives
+  - copy constructors
+    - overload constructor to accept the same object reference and handle it appropriately
+  - static factories
+
+
+
+
+
+
+
+
 
 # important notes
 - when an int is added to a collection, auto boxing happens and the int value is stored in a Integer object
