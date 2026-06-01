@@ -1002,6 +1002,35 @@ Collections revision
 
 
 
+# Singleton design pattern
+- only one object should exist
+  - have a static final variable pointing to same class object 
+    - in static field initializer 
+    - static initializer 
+    - when user asks for object (lazy initialization)
+  - mark constructor private
+  - have a static function to return current object reference. if reference is null then create a new object
+  - As always all variables should be marked private
+- used in logger, connection poller object
+
+
+# logger
+- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1014,8 +1043,10 @@ Collections revision
 - singleton design pattern => private constructor, synchronized method to return single object instance
 - sequential execution is necessary whenever there is some check done and then some action and hence a lock on the object must be acquired
 - obj.wait() does not wait for change in object state but waits for obj.notifyAll to be called
-
-
+- design pattern is a best practice strategy to adopt for a recurring requirement
+  - what is the repeating requirement
+  - what is the best practice strategy
+- immutable classes are marked final
 
 
 

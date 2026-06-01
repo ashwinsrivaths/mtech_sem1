@@ -2,5 +2,6 @@
     "cSpell.words": [
         "eceptionally",
         "heighrachies"
-    ]
+    ],
+    "java.debug.settings.onBuildFailureProceed": true
 }
