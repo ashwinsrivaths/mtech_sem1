@@ -881,7 +881,7 @@ Collections revision
 
 - dhobi example
   - there is a dhobi and a helper
-  - both the classes will accept in and out butti through constrtuctor
+  - both the classes will accept in and out butti through constructor
     - Collection inButti
     - Collection outButti
   - run method of dhobi
@@ -894,7 +894,11 @@ Collections revision
     - collect cloths
     - add them to inButti
     - synchronized(inButti){inButti.notifyAll();}
-
+- if notify() is called, any one waiting thread is bumped back to runnable
+- notifyAll() bumps back all waiting threads to runnable
+- these methods are called on an object
+- for calling these methods, the lock of the object must be acquired (and hence must be inside a synchronized code block)
+- wait releases the lock and puts the thread to waiting state
 ## java.util.concurrency
 - since the above implementation is hard we have collections that are implementing this and we just need to use them
 - BlockingQueue => it is a concurrent queue where any no of threads can write to it and any number of threads can read from it and there is no problem
@@ -1021,6 +1025,47 @@ Collections revision
 
 
 
+# App Development
+- prototype
+  - build a non working model to understand if the requirements are understood correctly
+  - it is a non working model of the final solution that will be shown to the end user
+  - built on paper or using simple tools
+    - views
+      - start with home view (what the user sees when he starts the app)
+      - actions that can be performed and and their flow
+      - control flow
+      - input validations and messages displayed
+      - business validations
+
+
+
+# MVC Design pattern
+- Model View Controller
+- View (agent)
+  - user facing 
+  - show UI
+  - show output 
+  - accept input
+  - SHOULD NOT DO CONTROLLER LOGIC/ business logic/ data logic
+  - _
+  - When we want to pass multiple data points to the next layer we will not use collections as we have different data types
+  - we create a class and pass an object of the said class
+  - such a class that contains only data is commonly called Java Beans
+  - JAVA BEAN is a ordinary java class with setters and getters
+- Controller (branch office)
+  - control flow management
+  - Data flow management
+  - No UI/ business logic/ data logic
+  - Invoke the correct business logic
+  - pass the input data from the view to the Model
+- Model (main office creating the contract)
+  - perform business logic
+  - use core oo features
+    - encapsulation
+    - inheritance 
+    - polymorphism
+  - No UI/ control logic
+- Data
 
 
 
@@ -1047,6 +1092,7 @@ Collections revision
   - what is the repeating requirement
   - what is the best practice strategy
 - immutable classes are marked final
+- Date dt = new Date();
 
 
 
@@ -1066,8 +1112,40 @@ Collections revision
 
 # InnerClass
 - anonymous inner class
-new Thread(){
-    public void run(){
-        for(int i=0; i<100; i++>){.....}
-    }
-}.start(); 
+  new Thread(){
+      public void run(){
+          for(int i=0; i<100; i++>){.....}
+      }
+  }.start(); 
+
+  - IMP: we are passing a anonomous inner class object to the Thread constructor
+  - this object implementing runnable represents a job
+
+  - If I have a requirement such that i want to use a class but extend one of its methods
+    - conventional approach
+      - create a new class extending the current class
+      - override the method whose implementation you want to enhance
+      - pass this child object wherever the parent is expected
+    - But I want a simpler approach => Anonymous Inner Class
+    - Syntax
+      - X obj = new X(){
+        - // I can override methods here
+        - public void testMethod(){
+            //New implementation
+          }
+      - };
+- Method local Inner class
+  - class defined inside a method
+  - main(...){
+    - class Z extends X {
+      - public void myMethod(){
+        - // ......
+      - }
+    - }
+    - X obj1 = new Z();
+    - X obj2 = new Z();
+  - }
+
+
+  - anonymous inner class is used when i want only one object of a class and don't want to create a separate class file
+  - method local inner class is used when i want multiple objects of a class but only inside a method and don't want to create a separate class file
