@@ -7,4 +7,16 @@
 4) to do list should be prioritized
 5) today is a good day
 6) always loose in relation ships to make love win
-7) 
+7) If something dosent work we make it about us and give a story
+   1) the actual question is what went wrong and did we give our best
+   2) how to handle being upset
+   3) life is not about howmuch you can pubch but howmuch beating you can take
+8) Integrity
+   1) honour the time given 
+      1) must and should communicate if not able to honour
+   2) a
+   3) a
+   4) internal => what I think I will do I will do
+9)  a
+10) a
+11)  

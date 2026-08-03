@@ -1,15 +1,17 @@
 package com.task.taskmanager;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Task {
 
     private String name;
     private String description;
-    private Category category;
+    private CategoryBean category;
     private Date plannedCompletionDate;
 
-    public Task(String name, String description, Category category, Date plannedCompletionDate) {
+    public Task(String name, String description, CategoryBean category, Date plannedCompletionDate) {
         this.name = name;
         this.description = description;
         this.category = category;
@@ -32,11 +34,11 @@ public class Task {
         this.description = description;
     }
 
-    public Category getCategory() {
+    public CategoryBean getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(CategoryBean category) {
         this.category = category;
     }
 
@@ -93,8 +95,22 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task [name=" + name + ", description=" + description + ", category=" + category
-                + ", plannedCompletionDate=" + plannedCompletionDate + "]";
+        return name + "  ##  " + description + "  ##  " + category
+                + "  ##  " + plannedCompletionDate;
     }
 
+    public Task fromString(String taskString)   throws ParseException {
+        String[] stringArr = taskString.split(" ");
+
+        if (stringArr.length != 4) {
+            throw new IllegalStateException("malformed data stored in fs please delete and restart the system");
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date plannedCompletionDate = sdf.parse(stringArr[3]);
+        Date CurrentDate = new Date();
+        long diffInMillies = plannedCompletionDate.getTime() - CurrentDate.getTime();
+        // Date plannedCompletionDate = new Date(stringArr[3]);
+        return new Task(stringArr[0], stringArr[1], new CategoryBean(stringArr[3]), plannedCompletionDate);
+    }
 }

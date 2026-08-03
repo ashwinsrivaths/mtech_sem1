@@ -31,7 +31,7 @@ public class Logger {
                         try {
                             // LocalDateTime now = LocalDateTime.now();
                             Date dt = new Date();
-                            String log = "Log at: " + dt.toString() + ", Priority: " + priority + ", Message: " + msg;
+                            String log = "                                  Log at: " + dt.toString() + ", Priority: " + priority + ", Message: " + msg;
                             System.out.println(log);
                         } catch (Exception e) {
                             System.out.println("Error while logging command: " + e.getMessage());

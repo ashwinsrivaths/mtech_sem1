@@ -2,14 +2,14 @@ package com.task.taskmanager;
 
 import com.task.taskmanager.Util;
 
-public final class Category {
+public final class CategoryBean {
     final String category;
 
-    // public String getCategory() {
-    //     return category;
-    // }
+    public String getName() {
+        return category;
+    }
 
-    public Category(String category) {
+    public CategoryBean(String category) {
         if (!Util.validateName(category)) {
             throw new IllegalArgumentException("name\n" + //
                                 "  - should start with letter\n" + //
@@ -35,7 +35,7 @@ public final class Category {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Category other = (Category) obj;
+        CategoryBean other = (CategoryBean) obj;
         if (category == null) {
             if (other.category != null)
                 return false;

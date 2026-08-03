@@ -114,6 +114,12 @@
 - ALWAYS USE .equals(obj) to compare any object including strings to compare state
 
 
+## Date
+- SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+- Date myBirthday = sdf.parse("01/12/1998");
+- long time = myBirthday.getTime();
+- String bDay = sdf.format(d);
+
 ## functions
 - in function overloading, if there is no exact match and there are two methods that are at the same level when upcasted, error is thrown
 
@@ -130,6 +136,7 @@
 - static -> method, variable, inner class, initializer
 - final -> class, method, variable
 - synchronized -> method, code block
+- native -> method
 
 
 ### static
@@ -1067,18 +1074,81 @@ Collections revision
   - No UI/ control logic
 - Data
 
+## java bean
+- java bean is a normal java object built with conventions
+  - is a data holder without business logic
+  - must be in a package
+  - must have a public no-arg constructor
+  - inst variables as many has a attributes with same name as attribute name
+  - setters and getters (all instance variables should be private) (take data type of the variable only)
+    - the getter method for boolean is called isVariable and not getVariable
+  - implement natural ordering by implementing comparable
+  - implement serializable marker interface
+- Benefits
+  - can be passed across layers as a data holder
+  - discoverable/auto data injection because best practices are followed
+
+
+# steps to build applications
+- understand the requirements
+- prototype - non working model of the final app
+  - paper
+  - wireframe
+  - low fidelity prototype
+  - high fidelity prototype
+- Ideally code is written once high fidelity prototype is available and at a minimum low fidelity prototype is needed
+- 
+- bean or model is created by the UI and passed to controller to service (BL) and is finally stored in the database
+
+
+# Database
+- sql based relation database 
+- no sql based database
 
 
 
+## JDBC (used only with sql databases (java.sql))
+- connect a java application to any database and execute DDL and DML commands
+- our application should be completely independent of database
+
+- our program should establish a socket to the chosen database app and this is automated by JDBC driver
+  - type 1 bridge driver => connects the java app with another driver which connects with the database
+    - one driver and be used to communicate with many databases
+    - slower in performance
+  - type 2 - native => directly communicates with database (make database native api calls to a particular db)
+    - database dependent and os dependent
+    - super fast
+  - type 3 - middleware => communicates with a middleware (part hardware part software)
+    - middleware can do asynchronous processing and hence faster
+    - proprietary drivers that need to be purchased
+    - credit card, the payment is processed and is asynchronously processed (sometimes the bank calls after some time confirming the transactions)
+  - type 4 - pure java => the database api are built on java and the java application is making java calls (java to java unlike type 2 which is java to c)
+    - fast
+    - os independent
+    - db dependent
 
 
+- load the driver
+  - Class.forName("fully qualified class name of driver class");
+  - the static initializer registers the driver with the driver manager
+
+## SQL
+- create, alter, drop => DDL cmds (data definition logic)
+  - tables 
+  - views
+  - sequences
+  - indexes
+- DML cmds (data manipulation logic)
+  - insert
+  - delete 
+  - update 
+  - select
 
 
-
-
-
-
-
+- Transaction is a unit of work that spans multiple SQL cmds which either succeeds fully or is revoked fully
+  - example student registration
+  - first we store the details and then create a library account
+  - if if address storage fails then the entire transactions should be revoked
 
 
 
@@ -1093,10 +1163,23 @@ Collections revision
   - what is the best practice strategy
 - immutable classes are marked final
 - Date dt = new Date();
+- to create a class class object by calling the class loader use -> Class.forName("com.uis.Test")
 
 
 
 
+
+
+
+
+
+2009 - 2016 native android
+
+2017 2018 => flutter / react native
+
+- yesterday
+- today
+- any blockers
 
 
 # java io
