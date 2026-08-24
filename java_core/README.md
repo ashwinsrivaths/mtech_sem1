@@ -82,7 +82,7 @@
     2)  ensure that the ordering of obtaining of locks is in same order to prevent deadlock when having nested synchronization blocks
 
 
-
+4) slNo integer PRIMARY KEY auto_increment to be implemented as the first column in all tables
 
 
 
@@ -1133,7 +1133,9 @@ Collections revision
   - the static initializer registers the driver with the driver manager
 
 ## SQL
-- create, alter, drop => DDL cmds (data definition logic)
+- sql is a standard that is implemented be all RDBMS solution providers like MySql to enable developers to communicate with the database. It forms the interface between the database and the application.
+- table is a unit data structure is used to store data (for one thing)
+- DDL cmds => create, alter, drop => (data definition logic) can be used to manipulate the table/data structure
   - tables 
   - views
   - sequences
@@ -1143,6 +1145,11 @@ Collections revision
   - delete 
   - update 
   - select
+- DCL - data control logic - data base administrator - grant and revoke access
+
+
+- row is a set of values for all chosen column values that have been chosen during DDL stage
+- one object represents one row and a collections of objects represent a table
 
 
 - Transaction is a unit of work that spans multiple SQL cmds which either succeeds fully or is revoked fully
@@ -1150,6 +1157,110 @@ Collections revision
   - first we store the details and then create a library account
   - if if address storage fails then the entire transactions should be revoked
 
+- data types
+  - char - store characters and occupies all the size allocated
+    - id char(10) => fixed size
+  - varchar - stores characters and occupies only the size needed but should be less than the max space allocated
+    - name varchar(10) => varying size
+  - dec - decimal
+    - salary dec(15,3) => total no of digits is 15 and there are 3 decimal places
+  - integer
+  - datetime
+    - YYYY-MM-DD HH:MI:SS
+  - timestamp
+    - used for system generated data and is a num of ms from a epoch time
+  - lob => blob
+
+- CREATE TABLE tmDatabase(id char(12), name varchar(200), creationDate date);
+- INSERT INTO tmDatabase(id, name, creationDate) VALUES('1001', 'test', '2020-12-25');
+- SELECT * FROM tmDatabase;
+- UPDATE tmDatabase SET creationDate = '2020-12-26' WHERE id='1001';
+- DELETE FROM tmDatabase WHERE id='1001';
+
+
+- delete - DML cmd
+- drop - DDL cmd
+
+- normalization rules are rules to be followed while designing a table (data modeling rules)
+  - non redundant data
+    - in one table have only parameters/values with one is to one cardinality
+    - have a separate secondary table to capture non one is to one cardinality
+  - every thing in the table should be directly dependent on every other thing in the table
+
+- null in database is the absence of a value and one null in the SQL world is not equal to another null
+
+- Constraints
+  - CREATE TABLE tmDatabase(slNo integer PRIMARY KEY, id char(12) UNIQUE NOT NULL, name varchar(200) NOT NULL, creationDate date);
+  - NOT NULL =>  mandatory to provide the value (null not allowed)
+  - UNIQUE KEY 
+    - value if given should unique within the table across all the rows (for that column) 
+    - null is allowed => since in sql one null is not equal to another null, any number of nulls can be added
+    - used to ensure that values inserted are unique
+  - PRIMARY KEY => UNIQUE + NOT NULL 
+    - never choose a business driven column for this purpose
+    - only one per table
+    - BEST PRACTICE => slNo INTEGER PRIMARY KEY AUTO_INCREMENT as first column for every table
+    - used to identify the row uniquely and used to link with secondary tables foreign key
+  - FOREIGN KEY => value should be one from the primary key column that it is associated with
+  - CHECK
+
+- whenever I have a enum (one amongst many) => I need to create a master table and store the value as a foreign key in my table
+
+- between(10,20)
+- in(10,20,30)
+- order by col desc limit fromIdex,numberOfRows
+
+## Aggregate functions => placed after select in the column names section
+- max 
+- min
+- avg
+- count
+- sum
+
+- select distinct name form emp => for unique values (set)
+
+- having applied after group by and where applied before group by
+- order by and limit is applied in the end
+
+
+
+- NEW TABLE FOR (first normal form)
+  - time bound quantities
+  - non atomic quantities (address has sub fields) 
+    - we must not have multiple columns storing the same value
+    - no aggregated columns (comma separated values)
+  - columns with cardinality 1:n and m:n
+  - values are one from a fixed set of values (enum)
+
+- 2nd normal form
+  - should be in first normal form
+  - all columns must be dependent on the full primary key (all the primary key columns)
+  - because we are following the best practice of creating a non business surrogate column as primary key we are always satisfying this condition
+
+- 3rd normal form
+  - should be in 2nd normal form
+  - no transative dependency
+    - all columns should depend on the table and not on each other
+
+
+- index
+  - to enable binary searching the index table is created where all the data references is stored in sorted order
+  - by default the primary key is indexed
+  - CREATE INDEX idx_lastname ON employees (lastname); => now search on lastname will be in log2(n) time
+
+cross join - cartician join
+inner join - only common elements
+
+
+- select * from dep1 UNION select * from dep2
+  - union: all records returned. for duplicate records, only one copy is returned
+  - union all: all records returned and copies are also returned
+  - intersect: select only single copy of common records across the intersected statements
+  - except: records that are not present in the intersection are preserved
+
+
+- delete from emp where slno=1 CASCADE
+  - CASCADE deletes rows that are referencing this record
 
 
 # important notes
@@ -1166,10 +1277,30 @@ Collections revision
 - to create a class class object by calling the class loader use -> Class.forName("com.uis.Test")
 
 
+SELECT DISTINCT <COLUMN NAMES / * / AGGRIGATE FUNCTIONS AS name>
+FROM <tables>
+WHERE <condition>
+GROUP BY <column names>
+HAVING <condition>
+ORDER BY <col names>
+LIMIT StartIndex,numberOfRows
 
 
 
 
+# Internet
+- isp - internet service provider
+- www is a service that runs on the internet infrastructure
+- HTTP sits on top of TCP protocol that allows us to ask for resources
+  - text based protocol
+  - 1 response with 1 mime type
+  - pull based protocol
+    - the client has to specifically pull data and the server cant push data
+    - either a new request every few seconds to check for update (polling)
+    - orr websocket based tcp connection can be used
+- web server is a software that responds to http requests
+
+- server in android application can push data to the client device where as a webapp server using http can not push data to the application
 
 
 
